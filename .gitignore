@@ -1,0 +1,6 @@
+# Ignore personal device configuration
+# Include example files
+device_config/*
+!device_config/example/
+
+**/__pycache__/

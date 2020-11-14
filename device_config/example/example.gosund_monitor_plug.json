@@ -1,0 +1,51 @@
+{
+    "name": "Gosund smart plug",
+    "description": "Gosund smart plug flashed with Tasmota",
+    "device_type": "Tasmota",
+    "active": true,
+    "details": {
+        "brand": "Gosund",
+        "model": "UP111"
+    },
+    "connection": {
+        "ip_address": "<plug_ip_address>",
+        "ip_port": 80
+    },
+    "authentication": {
+        "username": "<username>",
+        "password": "<password>"
+    },
+    "requests": [{
+            "name": "STATUS",
+            "description": "Fetch current switch status",
+            "command": "cmnd=Power",
+            "example": "http://127.0.0.1/cm?user=<username>&password=<password>&cmnd=Power"
+        },
+        {
+            "name": "POWER_MONITOR",
+            "description": "Fetch all power monitoring data",
+            "command": "cmnd=Status+8",
+            "example": "http://127.0.0.1/cm?user=<username>&password=<password>&cmnd=Status+8"
+        }
+    ],
+    "commands": [{
+            "name": "TOGGLE",
+            "description": "Toggle current switch status",
+            "command": "cmnd=Power%20Toggle",
+            "example": "http://127.0.0.1/cm?user=<username>&password=<password>&cmnd=Power%20Toggle"
+        },
+        {
+            "name": "ON",
+            "description": "Set switch status to ON",
+            "command": "cmnd=Power%20ON",
+            "example": "http://127.0.0.1/cm?user=<username>&password=<password>&cmnd=Power%20ON"
+        },
+        {
+            "name": "OFF",
+            "description": "Set switch status to OFF",
+            "command": "cmnd=Power%20OFF",
+            "example": "http://127.0.0.1/cm?user=<username>&password=<password>&cmnd=Power%20OFF"
+        }
+    ]
+
+}
