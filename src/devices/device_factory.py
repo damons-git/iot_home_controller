@@ -5,7 +5,6 @@ from .zigbee_device import ZigbeeDevice
 
 from .authentication.http_basic_auth import HttpBasic
 from .authentication.auth_types import AuthType
-from .authentication.authentication_factory import AuthenticationFactory
 
 
 class DeviceFactory:

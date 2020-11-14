@@ -3,4 +3,11 @@
 device_config/*
 !device_config/example/
 
+# Exclude python bytecode
 **/__pycache__/
+
+# Exclude virtual env
+env/
+
+# Exclude dotenv
+.env
