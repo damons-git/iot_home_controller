@@ -30,3 +30,6 @@ class DeviceType(Enum):
         else:
             raise NotImplementedError("Device type {0} not implemented".format(name))
 
+
+    def __str__(self):
+        return self.name
