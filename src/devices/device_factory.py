@@ -29,8 +29,8 @@ class DeviceFactory:
             return self.__create_zigbee(config)
 
         else:
+            raise DeviceNotSupported(device)
             self.logger.error("Device type {0} not implemented in device factory".format(device))
-            return None
 
 
     def __create_tasmota(self, config: dict) -> TasmotaDevice:
@@ -44,8 +44,7 @@ class DeviceFactory:
             requests    = dict([self.__create_tasmota_command(req)  for req  in config["requests"]])
 
         except KeyError as err:
-            self.logger.error("Cannot parse tasmota device as required fields are not present in config: {}".format(config))
-            return None
+            raise MalformedDeviceConfig(err)
 
         auth = HttpBasic(AuthType.HTTP_BASIC, True, username, password)
         return TasmotaDevice(
@@ -70,17 +69,32 @@ class DeviceFactory:
             return (name, TasmotaCommand(name, desc, command, example))
 
         except:
-            self.logger.error("Unable to parse tasmota command: {}".format(command_conf))
-            return None
+            self.logger.error("Unable to parse tasmota command, skipping command: {}".format(command_conf))
+            return (None, None)
 
 
     def __create_zigbee(self, config: dict) -> ZigbeeDevice:
         return NotImplementedError
 
 
-    def __create_authentication(self, config: dict):
-        raise NotImplementedError
+
+class DeviceNotSupported(Exception):
+    def __init__(self, device_type: DeviceType):
+        self.device_type = device_type
+
+    def __repr__(self):
+        return "DeviceNotSupported(type: {0})".format(self.device_type)
+
+    def __str__(self):
+        return self.__repr__()
 
 
-    def __create_communication(self, config: dict):
-        raise NotImplementedError
+class MalformedDeviceConfig(Exception):
+    def __init__(self, key: str):
+        self.key = key
+
+    def __repr__(self):
+        return "MalformedDeviceConfig(key: {0})".format(self.key)
+
+    def __str__(self):
+        return self.__repr__()

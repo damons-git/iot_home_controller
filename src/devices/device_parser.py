@@ -6,7 +6,7 @@ from .device_types import DeviceType
 from .device import Device
 from .tasmota_device import TasmotaDevice
 from .zigbee_device import ZigbeeDevice
-from .device_factory import DeviceFactory
+from .device_factory import DeviceFactory, MalformedDeviceConfig, DeviceNotSupported
 
 
 class DeviceParser:
@@ -18,6 +18,7 @@ class DeviceParser:
     """
 
     def __init__(self, directory: str):
+        self.logger = Logger()
         self.directory = directory
         self.failed = []
         self.succeeded = []
@@ -32,16 +33,26 @@ class DeviceParser:
             config = handle.read()
 
         except Exception as err:
-            print("Unable to open config file {0} with error: {1}".format(config_path, err))
+            self.logger.error("Unable to open config file {0} with error: {1}".format(config_path, err))
+            return
 
-        if self.valid_json(config):
+        try:
             device_conf = json.loads(config)
             device_type = DeviceType.from_str(device_conf["device_type"])
             device = factory.create_device(device_type, device_conf)
             return device
 
-        else:
-            return None
+        except DeviceNotSupported as err:
+            self.logger.error("Device type not supported in device factory \"{0}\" in \"{1}\"".format(err, config_path))
+            return
+
+        except MalformedDeviceConfig as err:
+            self.logger.error("Malformed device configuration file \"{0}\": \"{1}\"".format(config_path, err))
+            return
+
+        except Exception as err:
+            self.logger.error("Unknown exception: \"{0}\"".format(config_path, err))
+            return
 
 
     def get_configs(self) -> [str]:
@@ -56,17 +67,3 @@ class DeviceParser:
             print(err)
 
         return files
-
-
-    def valid_json(self, value: str) -> bool:
-        # Guard to check that string provided is parsable JSON
-        try:
-            json.loads(value)
-            return True
-
-        except ValueError:
-            return False
-
-        except Exception as err:
-            print(err)
-            return False
