@@ -2,6 +2,7 @@ import abc
 import requests
 from requests.exceptions import HTTPError
 
+from logger import Logger
 from .device import Device
 from .device_types import DeviceType
 from .authentication.http_basic_auth import HttpBasic
@@ -17,6 +18,7 @@ class TasmotaDevice(Device):
 
     def __init__(self, name: str, description: str, device_type: DeviceType, active: bool, ip: str, port: int, auth: HttpBasic, commands: dict, requests: dict):
         super(TasmotaDevice, self).__init__(name, description, device_type, active)
+        self.logger = Logger()
         self.ip = ip
         self.port = port
         self.auth = auth
@@ -36,12 +38,13 @@ class TasmotaDevice(Device):
             self.request(command_str)
 
         else:
-            print("Device \"{0}\" has no matching command or request with name: \"{1}\"".format(self.name, command_str))
+            self.logger.error("Device \"{0}\" has no matching command or request with name: \"{1}\"".format(self.name, command_str))
 
 
     def command(self, name: str):
         # Execute a device command
         command_obj = self.commands[name]
+        self.logger.info("\"{0}\": Executing command \"{1}\"".format(self.name, command_obj))
 
         auth_str = self.__get_authentication()
         cmnd_str = command_obj.command
@@ -53,12 +56,13 @@ class TasmotaDevice(Device):
         )
 
         resp = self.__get_request(url)
-        print(resp.text)
+        self.logger.info("\"{0}\": Command response \"{1}\"".format(self.name, resp.text))
 
 
     def request(self, name: str):
         # Execute a device data request
         request_obj = self.requests[name]
+        self.logger.info("\"{0}\": Executing data request \"{1}\"".format(self.name, command_obj))
 
         auth_str = self.__get_authentication()
         req_str  = request_obj.command
@@ -70,7 +74,7 @@ class TasmotaDevice(Device):
         )
 
         resp = self.__get_request(url)
-        print(resp.text)
+        self.logger.info("\"{0}\": Request response \"{1}\"".format(self.name, resp.text))
 
 
     def __get_request(self, url: str) -> str:
@@ -79,11 +83,11 @@ class TasmotaDevice(Device):
             response.raise_for_status()
 
         except HTTPError as err:
-            print("HTTP error: {}".format(err))
+            self.logger.error("HTTP error occurred when sending command \"{0}\" to device \"{1}\": {2}".format(url, self.name, err))
             return None
 
         except Exception as err:
-            print("Exception has occurred: {}".format(err))
+            self.logger.error("Exception has occurred when sending command \"{0}\" to device \"{1}\": {2}".format(url, self.name, err))
             return None
 
         return response
@@ -112,3 +116,7 @@ class TasmotaCommand:
         self.description    = description
         self.command        = command
         self.example        = example
+
+
+    def __repr__(self):
+        return "TasmotaCommand(name: {0}, command: {1})".format(self.name, self.command)

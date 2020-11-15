@@ -32,6 +32,6 @@ class Controller:
             devices[0].execute("toggle")
 
         except Exception as err:
-            print(err)
+            self.logger.error("Failed to parse device configs with thrown Exception: {}".format(err))
 
 

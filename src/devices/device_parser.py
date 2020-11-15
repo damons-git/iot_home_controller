@@ -1,6 +1,7 @@
 import os
 import json
 
+from logger import Logger
 from .device_types import DeviceType
 from .device import Device
 from .tasmota_device import TasmotaDevice
