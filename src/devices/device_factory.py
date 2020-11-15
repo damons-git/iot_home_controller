@@ -49,6 +49,9 @@ class DeviceFactory:
         except KeyError as err:
             raise MalformedDeviceConfig(err)
 
+        if not active:
+            return None
+
         auth = HttpBasic(AuthType.HTTP_BASIC, True, username, password)
         return TasmotaDevice(
                 name,

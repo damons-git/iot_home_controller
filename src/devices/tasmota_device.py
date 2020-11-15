@@ -26,7 +26,7 @@ class TasmotaDevice(Device):
         self.requests = requests
 
 
-    def execute(self, command_str):
+    def execute(self, command_str: str):
         # Execute a command / data request on the device
         # with the specified name
         command_str = command_str.upper()
@@ -75,6 +75,13 @@ class TasmotaDevice(Device):
 
         resp = self.__get_request(url)
         self.logger.info("\"{0}\": Request response \"{1}\"".format(self.name, resp.text))
+
+
+    def has_command(self, command_str: str) -> bool:
+        if command_str in (self.commands or self.requests):
+            return True
+        else:
+            return False
 
 
     def __get_request(self, url: str) -> str:

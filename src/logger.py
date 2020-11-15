@@ -48,7 +48,7 @@ class Logger:
         logger.addHandler(cli_handler)
         logger.addHandler(file_handler)
 
-        logger.info("Application logger configured")
+        logger.info("Custom logger configured, writing to: \"{0}\"".format(filepath))
 
 
     def __new__(cls):

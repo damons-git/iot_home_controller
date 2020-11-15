@@ -24,6 +24,20 @@ class DeviceParser:
         self.succeeded = []
 
 
+    def get_configs(self) -> [str]:
+        # Fetch set of config files in environemnt specified directory
+        try:
+            files = [self.directory + f for f
+                in os.listdir(self.directory)
+                if os.path.isfile(self.directory + f)
+                and os.path.splitext(f)[1] == '.json']
+
+        except Exception as err:
+            print(err)
+
+        return files
+
+
     def load_device(self, config_path: str) -> Device:
         # Parse config and return corresponding device object
         factory = DeviceFactory()
@@ -53,17 +67,3 @@ class DeviceParser:
         except Exception as err:
             self.logger.error("Unknown exception: \"{0}\"".format(config_path, err))
             return
-
-
-    def get_configs(self) -> [str]:
-        # Fetch set of config files in environemnt specified directory
-        try:
-            files = [self.directory + f for f
-                in os.listdir(self.directory)
-                if os.path.isfile(self.directory + f)
-                and os.path.splitext(f)[1] == '.json']
-
-        except Exception as err:
-            print(err)
-
-        return files

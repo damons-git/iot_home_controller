@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import os
+import sys
 
 from hub_controller import Controller
 from logger import Logger
@@ -16,8 +17,18 @@ log_name = "application.log"
 Logger.output_dir(log_path)
 Logger.output_name(log_name)
 Logger.setup()
-log = Logger()
+logger = Logger()
 
 # Load application
-controller = Controller()
-controller.start()
+hub = Controller()
+try:
+    hub.start()
+
+except KeyboardInterrupt as err:
+    hub.stop()
+
+except Exception as err:
+    logger.critical("Exception encountered when starting main hub: {0}".format(err))
+    sys.exit()
+
+

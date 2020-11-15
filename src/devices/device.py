@@ -33,3 +33,8 @@ class Device(ABC):
     @abc.abstractmethod
     def request(self, name: str):
         raise NotImplementedError
+
+
+    @abc.abstractmethod
+    def has_command(self, command_name: str):
+        raise NotImplementedError
