@@ -11,3 +11,7 @@ env/
 
 # Exclude dotenv
 .env
+
+# Exclude application log(s)
+*.log
+**/logs/
