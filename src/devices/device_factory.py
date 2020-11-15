@@ -19,39 +19,42 @@ class DeviceFactory:
         self.logger = Logger()
 
 
-    def create_device(self, device: DeviceType, config: dict) -> Device:
+    def create_device(self, config_path: str, device: DeviceType, config: dict) -> Device:
         # Given a device type and a corresponding JSON config
         # create and return an instance of that device type
         if device is DeviceType.TASMOTA:
-            return self.__create_tasmota(config)
+            return self.__create_tasmota(config_path, config)
 
         elif device is DeviceType.ZIGBEE:
-            return self.__create_zigbee(config)
+            return self.__create_zigbee(config_path, config)
 
         else:
             raise DeviceNotSupported(device)
             self.logger.error("Device type {0} not implemented in device factory".format(device))
 
 
-    def __create_tasmota(self, config: dict) -> TasmotaDevice:
+    def __create_tasmota(self, config_path: str, config: dict) -> TasmotaDevice:
         # Instantiate an instance of a Tasmota device
         try:
+            name        = config["name"]
+            description = config["description"]
+            active      = config["active"]
             ip          = config["connection"]["ip_address"]
             port        = config["connection"]["ip_port"]
             username    = config["authentication"]["username"]
             password    = config["authentication"]["password"]
-            commands    = dict([self.__create_tasmota_command(cmnd) for cmnd in config["commands"]])
-            requests    = dict([self.__create_tasmota_command(req)  for req  in config["requests"]])
+            commands    = dict([self.__create_tasmota_command(config_path, cmnd) for cmnd in config["commands"]])
+            requests    = dict([self.__create_tasmota_command(config_path, req)  for req  in config["requests"]])
 
         except KeyError as err:
             raise MalformedDeviceConfig(err)
 
         auth = HttpBasic(AuthType.HTTP_BASIC, True, username, password)
         return TasmotaDevice(
-                config["name"],
-                config["description"],
+                name,
+                description,
                 DeviceType.TASMOTA,
-                config["active"],
+                active,
                 ip,
                 port,
                 auth,
@@ -59,7 +62,7 @@ class DeviceFactory:
                 requests
             )
 
-    def __create_tasmota_command(self, command_conf: dict):
+    def __create_tasmota_command(self, config_path: str, command_conf: dict):
         # Helper function for creating tasmota commands
         try:
             name    = command_conf["name"]
@@ -69,11 +72,11 @@ class DeviceFactory:
             return (name, TasmotaCommand(name, desc, command, example))
 
         except:
-            self.logger.error("Unable to parse tasmota command, skipping command: {}".format(command_conf))
+            self.logger.error("Unable to parse tasmota command for \"{0}\", skipping command: {1}".format(config_path, command_conf))
             return (None, None)
 
 
-    def __create_zigbee(self, config: dict) -> ZigbeeDevice:
+    def __create_zigbee(self, config_path: str, config: dict) -> ZigbeeDevice:
         return NotImplementedError
 
 

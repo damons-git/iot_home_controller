@@ -39,7 +39,7 @@ class DeviceParser:
         try:
             device_conf = json.loads(config)
             device_type = DeviceType.from_str(device_conf["device_type"])
-            device = factory.create_device(device_type, device_conf)
+            device = factory.create_device(config_path, device_type, device_conf)
             return device
 
         except DeviceNotSupported as err:

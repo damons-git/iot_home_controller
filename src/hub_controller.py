@@ -27,9 +27,12 @@ class Controller:
             devices = []
             for config in configs:
                 d = parser.load_device(config)
-                devices.append(d)
+                if d is not None:
+                    devices.append(d)
 
-            devices[0].execute("toggle")
+            print(devices)
+            for d in devices:
+                d.execute("toggle")
 
         except Exception as err:
             self.logger.error("Failed to parse device configs with thrown Exception: {}".format(err))
